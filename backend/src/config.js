@@ -1,7 +1,11 @@
 import dotenv from "dotenv";
 import path from "path";
+import { fileURLToPath } from "url";
 
-dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
+const configFileDir = path.dirname(fileURLToPath(import.meta.url));
+const projectRootDir = path.resolve(configFileDir, "../..");
+
+dotenv.config({ path: path.resolve(projectRootDir, ".env") });
 dotenv.config();
 
 const maxFileSizeMb = Number.parseInt(process.env.MAX_FILE_SIZE_MB || "100", 10);
@@ -22,7 +26,7 @@ function resolveUploadDir() {
     return path.resolve(process.cwd(), "uploads");
   }
 
-  return path.isAbsolute(envUploadDir) ? envUploadDir : path.resolve(process.cwd(), envUploadDir);
+  return path.isAbsolute(envUploadDir) ? envUploadDir : path.resolve(projectRootDir, envUploadDir);
 }
 
 export const config = {
