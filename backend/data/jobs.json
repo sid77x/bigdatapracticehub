@@ -1,6 +1,72 @@
 {
   "jobs": [
     {
+      "id": "3196277b-2c3e-420a-8aca-0ad4aff880a2",
+      "title": "bad-sparksql-validation",
+      "status": "failed",
+      "engine": "sparksql",
+      "language": "sql",
+      "createdAt": "2026-04-19T12:17:34.941Z",
+      "startedAt": "2026-04-19T12:17:34.964Z",
+      "endedAt": "2026-04-19T12:17:34.990Z",
+      "workingDirectory": "C:\\Users\\src20\\OneDrive\\Desktop\\Programming\\HobbyProjs\\BigDataLearner\\backend\\uploads\\3196277b-2c3e-420a-8aca-0ad4aff880a2",
+      "scriptName": "script.sql",
+      "scriptPath": "C:\\Users\\src20\\OneDrive\\Desktop\\Programming\\HobbyProjs\\BigDataLearner\\backend\\uploads\\3196277b-2c3e-420a-8aca-0ad4aff880a2\\script.sql",
+      "scriptSource": "this is not sql",
+      "dataFiles": [],
+      "dataFilePaths": [],
+      "params": {
+        "className": "",
+        "extraArgs": ""
+      },
+      "result": null,
+      "error": {
+        "message": "Practice validation failed.\n- sparksql script must include valid SQL statements like SELECT ... FROM or CREATE TABLE.\n- sparksql statements should end with ';'.",
+        "code": "PRACTICE_VALIDATION_FAILED",
+        "stdout": "",
+        "stderr": "- sparksql script must include valid SQL statements like SELECT ... FROM or CREATE TABLE.\n- sparksql statements should end with ';'."
+      },
+      "logs": [
+        "[2026-04-19T12:17:34.986Z] PRACTICE MODE: Running sparksql/sql without external Hadoop/Spark binaries.",
+        "[2026-04-19T12:17:34.987Z] No uploaded data files were found. Execution used script-only analysis.",
+        "[2026-04-19T12:17:34.988Z] Practice validation failed:\n- sparksql script must include valid SQL statements like SELECT ... FROM or CREATE TABLE.\n- sparksql statements should end with ';'.",
+        "[2026-04-19T12:17:35.033Z] Job failed: Practice validation failed.\n- sparksql script must include valid SQL statements like SELECT ... FROM or CREATE TABLE.\n- sparksql statements should end with ';'."
+      ]
+    },
+    {
+      "id": "bc6704c6-2e1a-4ab5-8cdd-cf58a954c9d2",
+      "title": "bad-pig-validation",
+      "status": "failed",
+      "engine": "pig",
+      "language": "pig-latin",
+      "createdAt": "2026-04-19T12:17:34.231Z",
+      "startedAt": "2026-04-19T12:17:34.238Z",
+      "endedAt": "2026-04-19T12:17:34.264Z",
+      "workingDirectory": "C:\\Users\\src20\\OneDrive\\Desktop\\Programming\\HobbyProjs\\BigDataLearner\\backend\\uploads\\bc6704c6-2e1a-4ab5-8cdd-cf58a954c9d2",
+      "scriptName": "script.pig",
+      "scriptPath": "C:\\Users\\src20\\OneDrive\\Desktop\\Programming\\HobbyProjs\\BigDataLearner\\backend\\uploads\\bc6704c6-2e1a-4ab5-8cdd-cf58a954c9d2\\script.pig",
+      "scriptSource": "garbage text without load or dump",
+      "dataFiles": [],
+      "dataFilePaths": [],
+      "params": {
+        "className": "",
+        "extraArgs": ""
+      },
+      "result": null,
+      "error": {
+        "message": "Practice validation failed.\n- Pig script must include a valid assignment LOAD statement (e.g. a = LOAD 'file').\n- Pig script must include valid DUMP/STORE statement.\n- Pig script statements should end with ';'.",
+        "code": "PRACTICE_VALIDATION_FAILED",
+        "stdout": "",
+        "stderr": "- Pig script must include a valid assignment LOAD statement (e.g. a = LOAD 'file').\n- Pig script must include valid DUMP/STORE statement.\n- Pig script statements should end with ';'."
+      },
+      "logs": [
+        "[2026-04-19T12:17:34.260Z] PRACTICE MODE: Running pig/pig-latin without external Hadoop/Spark binaries.",
+        "[2026-04-19T12:17:34.260Z] No uploaded data files were found. Execution used script-only analysis.",
+        "[2026-04-19T12:17:34.261Z] Practice validation failed:\n- Pig script must include a valid assignment LOAD statement (e.g. a = LOAD 'file').\n- Pig script must include valid DUMP/STORE statement.\n- Pig script statements should end with ';'.",
+        "[2026-04-19T12:17:34.286Z] Job failed: Practice validation failed.\n- Pig script must include a valid assignment LOAD statement (e.g. a = LOAD 'file').\n- Pig script must include valid DUMP/STORE statement.\n- Pig script statements should end with ';'."
+      ]
+    },
+    {
       "id": "f7714b2e-1360-4962-8a4e-d0e14e03a0f7",
       "title": "bad-pig-test",
       "status": "completed",

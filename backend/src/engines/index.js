@@ -194,16 +194,29 @@ function validatePracticeScript(job, script, referencedFiles, missingReferences)
       break;
     }
     case "mapreduce": {
-      const hasLogic = /\b(map|reduce|for|while|def|class|public\s+class)\b/i.test(script);
-      if (!hasLogic) {
-        errors.push("MapReduce script appears invalid. Include mapper/reducer logic.");
+      if (job.language === "python") {
+        const hasMapperReducer = /\bdef\s+(mapper|reducer)\s*\(/i.test(script);
+        const hasLoopOrEmit = /\bfor\b|\bwhile\b|\bprint\b/i.test(script);
+        if (!hasMapperReducer || !hasLoopOrEmit) {
+          errors.push("Python MapReduce script should define mapper/reducer functions and emit logic.");
+        }
+      } else {
+        const hasClass = /\bpublic\s+class\s+\w+/i.test(script);
+        const hasMapOrReduceMethod = /\bvoid\s+map\s*\(|\bvoid\s+reduce\s*\(/i.test(script);
+        if (!hasClass || !hasMapOrReduceMethod) {
+          errors.push("Java MapReduce script should include a class with map/reduce methods.");
+        }
       }
       break;
     }
     case "sparkml": {
-      const hasMlPattern = /\b(read|fit|transform|pipeline|SparkSession|ml\.)\b/i.test(script);
-      if (!hasMlPattern) {
-        errors.push("Spark ML script must include data read/model fit/transform style operations.");
+      const hasSession = /\bSparkSession\b|\.builder\.|new\s+SparkConf\s*\(/i.test(script);
+      const hasDataRead = /\bread\b|\.csv\s*\(|\.parquet\s*\(|\.json\s*\(/i.test(script);
+      const hasMlStep = /\bfit\s*\(|\btransform\s*\(|\bPipeline\b|\bLogisticRegression\b|\bVectorAssembler\b/i.test(
+        script
+      );
+      if (!hasSession || !hasDataRead || !hasMlStep) {
+        errors.push("Spark ML script must include Spark session setup, data read, and ML fit/transform steps.");
       }
       break;
     }
