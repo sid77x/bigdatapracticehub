@@ -30,6 +30,31 @@ function resolveStorePath() {
   return path.resolve(process.cwd(), "data", "jobs.json");
 }
 
+async function resolveWritableUploadDir(preferredDir) {
+  try {
+    await fs.mkdir(preferredDir, { recursive: true });
+    return preferredDir;
+  } catch (error) {
+    const fallbackDir = "/tmp/bigdata-learner/uploads";
+
+    if (preferredDir === fallbackDir) {
+      throw error;
+    }
+
+    logger.warn(
+      {
+        preferredDir,
+        fallbackDir,
+        error: error.message
+      },
+      "Configured upload directory failed, falling back to /tmp"
+    );
+
+    await fs.mkdir(fallbackDir, { recursive: true });
+    return fallbackDir;
+  }
+}
+
 async function hydrateJobScriptSource(job) {
   if (typeof job.scriptSource === "string") {
     return job;
@@ -64,7 +89,7 @@ async function createApp() {
   const store = new JobStore(resolveStorePath());
   await store.init();
 
-  await fs.mkdir(config.uploadDir, { recursive: true });
+  const uploadDir = await resolveWritableUploadDir(config.uploadDir);
 
   const runner = createJobRunner({
     store,
@@ -77,7 +102,8 @@ async function createApp() {
       status: "ok",
       executionMode: config.executionMode,
       runner: runner.stats(),
-      runtime: config.isVercelRuntime ? "vercel" : "node"
+      runtime: config.isVercelRuntime ? "vercel" : "node",
+      uploadDir
     });
   });
 
@@ -127,7 +153,7 @@ async function createApp() {
         const dataFiles = files.dataFiles || [];
 
         const id = uuidv4();
-        const workingDirectory = path.join(config.uploadDir, id);
+        const workingDirectory = path.join(uploadDir, id);
         await fs.mkdir(workingDirectory, { recursive: true });
 
         const scriptName = `script.${detectScriptExt(engine, language)}`;
