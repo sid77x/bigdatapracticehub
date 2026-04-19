@@ -142,6 +142,78 @@ function numericColumnSummaries(profile) {
   return stats.slice(0, 6);
 }
 
+function validatePracticeScript(job, script, referencedFiles, missingReferences) {
+  const errors = [];
+  const normalized = script.trim();
+
+  if (!normalized) {
+    errors.push("Script is empty.");
+  }
+
+  if (missingReferences.length > 0) {
+    errors.push(`Referenced files not uploaded: ${missingReferences.join(", ")}.`);
+  }
+
+  switch (job.engine) {
+    case "pig": {
+      const hasLoadStatement = /\b\w+\s*=\s*LOAD\s+['"][^'"]+['"]/i.test(script);
+      const hasSinkStatement = /\b(DUMP\s+\w+|STORE\s+\w+\s+INTO\s+['"][^'"]+['"])/i.test(script);
+      const hasSemicolon = /;/.test(script);
+      if (!hasLoadStatement) {
+        errors.push("Pig script must include a valid assignment LOAD statement (e.g. a = LOAD 'file').");
+      }
+      if (!hasSinkStatement) {
+        errors.push("Pig script must include valid DUMP/STORE statement.");
+      }
+      if (!hasSemicolon) {
+        errors.push("Pig script statements should end with ';'.");
+      }
+      break;
+    }
+    case "hive":
+    case "sparksql": {
+      const hasSqlStatement = /(SELECT\s+.+\s+FROM|CREATE\s+TABLE|LOAD\s+DATA|INSERT\s+INTO|WITH\s+\w+\s+AS)/is.test(
+        script
+      );
+      const hasSemicolon = /;/.test(script);
+      if (!hasSqlStatement) {
+        errors.push(`${job.engine} script must include valid SQL statements like SELECT ... FROM or CREATE TABLE.`);
+      }
+      if (!hasSemicolon) {
+        errors.push(`${job.engine} statements should end with ';'.`);
+      }
+      break;
+    }
+    case "hbase": {
+      const hasHbaseCommand = /(^|\n)\s*(create|put|get|scan|list|disable|enable|drop|count|describe)\b/i.test(
+        script
+      );
+      if (!hasHbaseCommand) {
+        errors.push("HBase script must include valid shell commands (create, put, get, scan, etc.).");
+      }
+      break;
+    }
+    case "mapreduce": {
+      const hasLogic = /\b(map|reduce|for|while|def|class|public\s+class)\b/i.test(script);
+      if (!hasLogic) {
+        errors.push("MapReduce script appears invalid. Include mapper/reducer logic.");
+      }
+      break;
+    }
+    case "sparkml": {
+      const hasMlPattern = /\b(read|fit|transform|pipeline|SparkSession|ml\.)\b/i.test(script);
+      if (!hasMlPattern) {
+        errors.push("Spark ML script must include data read/model fit/transform style operations.");
+      }
+      break;
+    }
+    default:
+      break;
+  }
+
+  return errors;
+}
+
 function buildPreviewTables(profiles) {
   return profiles
     .filter((profile) => profile.preview.length > 0)
@@ -194,6 +266,16 @@ async function executePracticeJob(job, onLog) {
 
   if (missingReferences.length) {
     onLog(`Warning: Referenced files not uploaded: ${missingReferences.join(", ")}`);
+  }
+
+  const validationErrors = validatePracticeScript(job, script, referencedFiles, missingReferences);
+  if (validationErrors.length > 0) {
+    const details = validationErrors.map((line) => `- ${line}`).join("\n");
+    onLog(`Practice validation failed:\n${details}`);
+    const err = new Error(`Practice validation failed.\n${details}`);
+    err.code = "PRACTICE_VALIDATION_FAILED";
+    err.stderr = details;
+    throw err;
   }
 
   let summary = "";

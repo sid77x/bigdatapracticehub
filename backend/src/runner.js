@@ -38,8 +38,6 @@ export function createJobRunner({ store, executionMode, logger }) {
           result,
           error: null
         });
-
-        await onLog("Job completed successfully.");
       } catch (error) {
         logger.error({ err: error, jobId }, "Job execution failed");
         await store.update(jobId, {

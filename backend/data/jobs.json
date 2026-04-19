@@ -1,6 +1,43 @@
 {
   "jobs": [
     {
+      "id": "f7714b2e-1360-4962-8a4e-d0e14e03a0f7",
+      "title": "bad-pig-test",
+      "status": "completed",
+      "engine": "pig",
+      "language": "pig-latin",
+      "createdAt": "2026-04-19T12:14:09.386Z",
+      "startedAt": "2026-04-19T12:14:09.389Z",
+      "endedAt": "2026-04-19T12:14:09.397Z",
+      "workingDirectory": "C:\\Users\\src20\\OneDrive\\Desktop\\Programming\\HobbyProjs\\BigDataLearner\\backend\\uploads\\f7714b2e-1360-4962-8a4e-d0e14e03a0f7",
+      "scriptName": "script.pig",
+      "scriptPath": "C:\\Users\\src20\\OneDrive\\Desktop\\Programming\\HobbyProjs\\BigDataLearner\\backend\\uploads\\f7714b2e-1360-4962-8a4e-d0e14e03a0f7\\script.pig",
+      "scriptSource": "garbage text without load or dump",
+      "dataFiles": [],
+      "dataFilePaths": [],
+      "params": {
+        "className": "",
+        "extraArgs": ""
+      },
+      "result": {
+        "exitCode": 0,
+        "command": "practice-runner",
+        "args": [
+          "pig",
+          "pig-latin"
+        ],
+        "stdout": "PIG practice summary\n- Input files: 0\n- LOAD ops: 1\n- SELECT ops: 0\n- FILTER ops: 0\n- GROUP ops: 0\n- JOIN ops: 0\n- Script parsed and linked to uploaded files",
+        "stderr": "",
+        "tables": []
+      },
+      "error": null,
+      "logs": [
+        "[2026-04-19T12:14:09.396Z] PRACTICE MODE: Running pig/pig-latin without external Hadoop/Spark binaries.",
+        "[2026-04-19T12:14:09.396Z] No uploaded data files were found. Execution used script-only analysis.",
+        "[2026-04-19T12:14:09.397Z] Practice execution completed."
+      ]
+    },
+    {
       "id": "14ed74c0-b2ec-4158-a38b-ff938577693a",
       "title": "pig-1776597978637",
       "status": "completed",

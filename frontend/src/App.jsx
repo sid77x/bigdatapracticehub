@@ -107,16 +107,20 @@ function deriveExecutionOutput(job) {
     return "Select a job to inspect output.";
   }
 
+  if (job.status === "failed") {
+    if (job.error?.stderr?.trim()) {
+      return job.error.stderr;
+    }
+
+    if (job.error?.message) {
+      return `Execution failed: ${job.error.message}`;
+    }
+
+    return "Execution failed.";
+  }
+
   if (job.result?.stdout?.trim()) {
     return job.result.stdout;
-  }
-
-  if (job.error?.stderr?.trim()) {
-    return job.error.stderr;
-  }
-
-  if (job.error?.message) {
-    return `Execution failed: ${job.error.message}`;
   }
 
   if (job.status === "queued") {
@@ -138,6 +142,10 @@ function deriveExecutionOutput(job) {
 }
 
 function deriveOutputTables(job) {
+  if (job?.status !== "completed") {
+    return [];
+  }
+
   const tables = job?.result?.tables;
   if (!Array.isArray(tables)) {
     return [];
