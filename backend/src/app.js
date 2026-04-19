@@ -13,6 +13,7 @@ import { JobStore } from "./storage.js";
 
 const logger = pino({ level: "info" });
 let appPromise = null;
+const validationProfileVersion = "practice-validator-v2-2026-04-19";
 
 function safeName(filename) {
   return filename.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -103,7 +104,8 @@ async function createApp() {
       executionMode: config.executionMode,
       runner: runner.stats(),
       runtime: config.isVercelRuntime ? "vercel" : "node",
-      uploadDir
+      uploadDir,
+      validationProfileVersion
     });
   });
 

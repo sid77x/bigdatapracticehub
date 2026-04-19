@@ -4,7 +4,7 @@ import Prism from "prismjs";
 import "prismjs/components/prism-sql";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-java";
-import { getEngines, getJobs, submitJob } from "./api";
+import { getEngines, getHealth, getJobs, submitJob } from "./api";
 
 const THEME_STORAGE_KEY = "bigdata-learner-theme";
 
@@ -179,6 +179,7 @@ export default function App() {
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [backendWarning, setBackendWarning] = useState("");
   const [theme, setTheme] = useState(getInitialTheme);
 
   const [form, setForm] = useState({
@@ -193,9 +194,38 @@ export default function App() {
   const dataFileInputRef = useRef(null);
 
   const selectedJob = useMemo(() => jobs.find((job) => job.id === selectedJobId) || null, [jobs, selectedJobId]);
+  const isDraftSyncedWithSelectedJob = useMemo(() => {
+    if (!selectedJob) {
+      return false;
+    }
+
+    const selectedCode = String(selectedJob.scriptSource || "").trim();
+    const selectedArgs = String(selectedJob.params?.extraArgs || "").trim();
+    const draftCode = String(form.code || "").trim();
+    const draftArgs = String(form.extraArgs || "").trim();
+
+    return (
+      selectedJob.engine === form.engine &&
+      selectedJob.language === form.language &&
+      selectedCode === draftCode &&
+      selectedArgs === draftArgs
+    );
+  }, [selectedJob, form]);
   const editorLanguage = getEditorLanguage(form.engine, form.language);
-  const executionOutput = useMemo(() => deriveExecutionOutput(selectedJob), [selectedJob]);
-  const outputTables = useMemo(() => deriveOutputTables(selectedJob), [selectedJob]);
+  const executionOutput = useMemo(() => {
+    if (selectedJob && !isDraftSyncedWithSelectedJob) {
+      return "Draft changed. Run this script to generate fresh output for what is currently in the editor.";
+    }
+
+    return deriveExecutionOutput(selectedJob);
+  }, [selectedJob, isDraftSyncedWithSelectedJob]);
+  const outputTables = useMemo(() => {
+    if (!isDraftSyncedWithSelectedJob) {
+      return [];
+    }
+
+    return deriveOutputTables(selectedJob);
+  }, [selectedJob, isDraftSyncedWithSelectedJob]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -205,12 +235,18 @@ export default function App() {
   useEffect(() => {
     async function bootstrap() {
       try {
-        const engines = await getEngines();
+        const [engines, health] = await Promise.all([getEngines(), getHealth()]);
         setEngineLanguages(engines.engineLanguages || {});
 
         const firstEngine = Object.keys(engines.engineLanguages || {})[0] || "mapreduce";
         const firstLanguage = engines.engineLanguages?.[firstEngine]?.[0] || "python";
         setForm((prev) => ({ ...prev, engine: firstEngine, language: firstLanguage }));
+
+        if (health.executionMode === "practice" && !health.validationProfileVersion) {
+          setBackendWarning(
+            "Backend appears outdated in practice mode. Redeploy latest backend so invalid scripts fail correctly."
+          );
+        }
       } catch (err) {
         setError(err.message);
       }
@@ -346,6 +382,8 @@ export default function App() {
           Practice MapReduce, Pig, Hive, HBase, Spark SQL, and Spark ML workflows with your own uploaded files.
         </p>
       </header>
+
+      {backendWarning ? <p className="warning-banner">{backendWarning}</p> : null}
 
       {error ? <p className="error-banner">{error}</p> : null}
 
@@ -500,6 +538,13 @@ export default function App() {
               </div>
 
               <pre className="logs">{selectedJob.logs?.join("\n") || "No logs yet"}</pre>
+
+              {selectedJob && !isDraftSyncedWithSelectedJob ? (
+                <p className="draft-warning">
+                  You are editing a different script than this selected job. Output below will update after you run the
+                  current draft.
+                </p>
+              ) : null}
 
               <h3 className="output-heading">Execution Output</h3>
               <pre className="logs">{executionOutput}</pre>

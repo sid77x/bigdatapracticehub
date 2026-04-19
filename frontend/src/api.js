@@ -22,6 +22,11 @@ export async function getJobs() {
   return parseResponse(res);
 }
 
+export async function getHealth() {
+  const res = await fetch(apiUrl("/api/health"));
+  return parseResponse(res);
+}
+
 export async function submitJob(payload) {
   const res = await fetch(apiUrl("/api/jobs"), {
     method: "POST",

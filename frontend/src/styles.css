@@ -151,6 +151,15 @@ body {
   margin-bottom: 1rem;
 }
 
+.warning-banner {
+  background: color-mix(in srgb, var(--pending) 22%, transparent);
+  color: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--pending) 60%, var(--border));
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.8rem;
+}
+
 .layout {
   display: grid;
   grid-template-columns: 1.3fr 1fr;
@@ -450,6 +459,12 @@ button:disabled {
   margin: 0.8rem 0 0.45rem;
   font-size: 0.95rem;
   letter-spacing: 0.02em;
+}
+
+.draft-warning {
+  margin: 0.65rem 0 0;
+  font-size: 0.82rem;
+  color: var(--pending);
 }
 
 .output-tables {
